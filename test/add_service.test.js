@@ -12,9 +12,7 @@ describe('valid input', () => {
     const expectedResponse = 6;
     expect(actualResponse).toBe(expectedResponse);
   });
-});
 
-describe('invalid input', () => {
   test('if invalid type in array, then it should throw error', () => {
     // prepare input
     const inputArray = ['1', '2', 3];

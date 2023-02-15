@@ -2,7 +2,7 @@ const AddController = require('../controller/add_controller.js');
 const AddService = require('../service/add_service.js');
 
 describe('addController()', () => {
-  test('if valid num array, then it should return the sum', () => {
+  test('if valid num array, then it should pass same to addService', () => {
     // prepare input
     const nums = [1, 2, 3];
     const params = { nums: nums };
@@ -12,53 +12,57 @@ describe('addController()', () => {
     const received = AddController.add(params);
 
     // compare the actual response with expected Response
-    expect(received).toBeTruthy();
+    expect(AddService.add).toBeCalledWith(nums);
   });
 
-  test('if valid mixed array, then it should return the sum', () => {
+  test('if valid mixed array, then it should convert to number and pass to addService', () => {
     // prepare input
     const nums = [1, '19', 3];
     const params = { nums: nums };
-    AddService.add = jest.fn(() => 23);
+
+    const returnValue = 23;
+    AddService.add = jest.fn(() => returnValue);
 
     // call the actual function
     const received = AddController.add(params);
 
     // compare the actual response with expected Response
     expect(AddService.add).toBeCalledWith([1, 19, 3]);
-
+    expect(received).toBe(returnValue);
   });
 
 
-  test('if null value in input, then it should return 400', () => {
+  test('if null value in input, then it should throw error', () => {
     // prepare input
-    const nums = [1, null, 3];
-    const params = { nums: nums };
+    const params = { nums: [1, null, 3] };
     AddService.add = jest.fn();
 
     // call the actual function
-    expect(() => {
-      AddController.add(params);
-    }).toThrow("REST_ERROR_INVALID_INPUT")
+    try {
+      const actualResponse = AddController.add(params);
+    } catch (error) {
+      // compare the actual response with expected Response
+      expect(error.message).toBe("REST_ERROR_INVALID_INPUT")
+    }
 
-    // compare the actual response with expected Response
     expect(AddService.add).not.toBeCalled();
   });
 
-  test('if service throws error, then it should handle and return 500', () => {
+  test('if service throws error, then it should pass on the same error', () => {
     // prepare input
-    const inputArray = [1, 2, 3];
+    const params = { nums: [1, 2, 3] };
 
     // mocked
     AddService.add = jest.fn(() => {
-      throw new Error()
+      throw new Error("invalid value in array")
     });
 
     // call the actual function
-    const actualResponse = AddController.add(inputArray);
+    try {
+      const actualResponse = AddController.add(params);
+    } catch (error) {
+      expect(error.message).toBe("invalid value in array")
+    }
 
-    // compare the actual response with expected Response
-    const expectedResponse = { statusCode: 500 };
-    expect(actualResponse).toMatchObject(expectedResponse);
   });
 });
