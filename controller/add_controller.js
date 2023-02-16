@@ -14,10 +14,6 @@ class AddController {
 
   _validateAndConvertToNumber(nums) {
     for (let i = 0; i < nums.length; i++) {
-      if (typeof nums[i] === "string") {
-        nums[i] = parseInt(nums[i]);
-      }
-
       if (isNaN(nums[i]) || typeof nums[i] !== "number") {
         throw new Error("REST_ERROR_INVALID_INPUT")
       }
